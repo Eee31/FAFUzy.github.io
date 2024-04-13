@@ -12,18 +12,18 @@
         height: 100%;
         width: 100%;
       }
+      /*页眉样式*/
       header {
-    background-image: url('https://img95.699pic.com/xsj/0r/2v/id.jpg%21/fh/300'); /* 页眉背景图片地址 */
-    background-repeat: no-repeat;
-    background-size: cover;
-    color: black;
-    padding: 0;
-    height:60px;
+        background-image: url('https://img95.699pic.com/xsj/0r/2v/id.jpg%21/fh/300'); /* 页眉背景图片地址 */
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: black;
+        padding: 0;
+        height:60px;
    }
-
-  header h1 {
+   header h1 {
     margin: 0 10px;
-    text-shadow: 2px 2px 4px rgba(226, 38, 38, 0.5);
+    text-shadow: 2px 2px 4px rgba(255, 213, 0, 0.5);
     font-family: '黑体', sans-serif; /* 修改字体为黑体 */
     text-align: left; /* 大标题左对齐 */
     height:5px;
@@ -34,19 +34,19 @@
     color: #999999; /* 设置小标题颜色 */
     text-align: left; /* 小标题也左对齐 */
     font-size:14px;
-
-   }
-    </style>
-
+  }
+  </style>
     <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css" />
-    <script src="https://js.arcgis.com/4.29/"></script>
+    <script src="https://js.arcgis.com/4.29/">
+  </script>
 
     <script>
       require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/ScaleBar",
         "esri/widgets/Legend", "esri/widgets/Search", "esri/widgets/Home", "esri/widgets/LayerList",
-        "esri/widgets/Compass", "esri/widgets/Locate", "esri/widgets/BasemapGallery"
-        ],
-      (Map, MapView, FeatureLayer, ScaleBar, Legend, Search, Home, LayerList, Compass, Locate, BasemapGallery) => {
+        "esri/widgets/Compass", "esri/widgets/Locate", "esri/widgets/BasemapGallery",
+        "esri/widgets/AreaMeasurement2D","esri/widgets/Expand","esri/widgets/Sketch","esri/layers/GraphicsLayer"
+               ], 
+      (Map, MapView, FeatureLayer, ScaleBar, Legend, Search, Home, LayerList, Compass, Locate, BasemapGallery,AreaMeasurement2D, Expand, Sketch, GraphicsLayer) => {
         //添加要素图层
         const flayer = new FeatureLayer({
             url: "https://www.geosceneonline.cn/server/rest/services/Hosted/全国各省人口出生率/FeatureServer"
@@ -91,7 +91,7 @@
             layerInfos: [
                 {
                     layer: flayer,
-                    title: "图例"
+                    //title: "图例"
                 }
             ]
         });
@@ -123,10 +123,35 @@
 				  }}
         });
         view.ui.add(gallery, "top-left");
-      });
-    </script>
-  </head>
+        //添加计算工具
+        const areaMeasurementWidget = new AreaMeasurement2D({
+          view: view,
+          unit: "square-kilometers"
+        });
 
+        const expand = new Expand({
+          view: view,
+          content: areaMeasurementWidget,
+          expandIconClass: "esri-icon-measure-area",
+          group: "analysis"
+        });
+
+        view.ui.add(expand, {
+        position: "top-left",       //位于左上
+        index: 1
+      });
+       //sketch
+       view.when(() => {
+        const sketch = new Sketch({
+          view: view,
+          // graphic will be selected as soon as it is created
+          creationMode: "update"
+        });
+        view.ui.add(sketch, "top-right");
+      })
+      });
+      </script>
+  </head>
   <body>
     <header>
         <h1>全国各省人口出生率</h1><br/>
